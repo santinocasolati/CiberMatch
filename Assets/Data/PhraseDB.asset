@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1db00a0582d1e784187aee97165a2266, type: 3}
+  m_Name: PhraseDB
+  m_EditorClassIdentifier: 
+  _phrases:
+  - _groupOnePhrase: "Usar contrase\xF1as fuertes y \xFAnicas"
+    _groupTwoPhrase: ayuda a proteger tus cuentas de accesos  no autorizados.
+  - _groupOnePhrase: Mantener el software actualizado
+    _groupTwoPhrase: reduce el riesgo de vulnerabilidades  explotables.
+  - _groupOnePhrase: No hacer clic en enlaces sospechosos
+    _groupTwoPhrase: previene ataques de phishing y malware.
+  - _groupOnePhrase: "Habilitar la autenticaci\xF3n de dos factores"
+    _groupTwoPhrase: "a\xF1ade una capa extra de seguridad a tus  cuentas."
+  - _groupOnePhrase: Realizar copias de seguridad regularmente
+    _groupTwoPhrase: asegura que no pierdas datos importantes  en caso de un ataque.
