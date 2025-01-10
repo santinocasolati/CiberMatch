@@ -1,13 +1,106 @@
+using DG.Tweening;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.iOS;
+using UnityEngine.UI;
 
-public class PhraseController : MonoBehaviour
+public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
+    [SerializeField] private float returnDuration = .5f;
+
     private int _id;
     private bool _isDraggable = false;
+    private bool _isMoving = false;
 
-    public void SetValues(int id, string text, bool isDraggable)
+    private RectTransform _rectTransform;
+    private Canvas _canvas;
+    private GraphicRaycaster _graphicRaycaster;
+    private CanvasGroup _canvasGroup;
+
+    private Vector2 _originalAnchoredPosition;
+
+    public int Id { get { return _id; } }
+
+    private void Awake()
+    {
+        _rectTransform = GetComponent<RectTransform>();
+        _canvasGroup = GetComponent<CanvasGroup>();
+    }
+
+    public void SetValues(int id, string text, bool isDraggable, Canvas canvas)
     {
         _id = id;
         _isDraggable = isDraggable;
+        _canvas = canvas;
+        _graphicRaycaster = _canvas.GetComponent<GraphicRaycaster>();
+
+        GetComponentInChildren<TMP_Text>().text = text;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        MatchAnimationService matchAnimationService = ServiceLocator.Instance.AccessService<MatchAnimationService>();
+        if (!_isDraggable || _isMoving || !matchAnimationService.CanDrag) return;
+
+        _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        MatchAnimationService matchAnimationService = ServiceLocator.Instance.AccessService<MatchAnimationService>();
+        if (!_isDraggable || _isMoving || !matchAnimationService.CanDrag) return;
+
+        _originalAnchoredPosition = _rectTransform.anchoredPosition;
+        transform.localScale = new Vector3(.85f, .85f, .85f);
+        _canvasGroup.alpha = .6f;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        MatchAnimationService matchAnimationService = ServiceLocator.Instance.AccessService<MatchAnimationService>();
+        if (!_isDraggable || _isMoving || !matchAnimationService.CanDrag) return;
+
+        PhraseController otherPhrase = TryMatch(eventData.position);
+
+        if (otherPhrase == null || _id != otherPhrase.Id)
+        {
+            _isMoving = true;
+            _rectTransform.DOAnchorPos(_originalAnchoredPosition, returnDuration).OnComplete(() =>
+            {
+                _isMoving = false;
+            });
+            transform.localScale = Vector3.one;
+            _canvasGroup.alpha = 1f;
+            return;
+        }
+
+        matchAnimationService.AnimateMatch(gameObject, otherPhrase.gameObject);
+    }
+
+    private PhraseController TryMatch(Vector2 position)
+    {
+        PointerEventData pointerEventData = new PointerEventData(EventSystem.current)
+        {
+            position = position
+        };
+
+        List<RaycastResult> raycastResults = new List<RaycastResult>();
+        _graphicRaycaster.Raycast(pointerEventData, raycastResults);
+
+        PhraseController otherPhrase = null;
+
+        foreach (RaycastResult result in raycastResults)
+        {
+            PhraseController tempPhrase = result.gameObject.GetComponent<PhraseController>();
+
+            if (tempPhrase != null && tempPhrase != this)
+            {
+                otherPhrase = tempPhrase;
+            }
+        }
+
+        return otherPhrase;
     }
 }
