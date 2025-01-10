@@ -42,3 +42,12 @@ To run the WebGL build in a browser, you need to serve it using a local web serv
 2. Open the folder containing your WebGL build in VS Code.
 3. Right-click on `index.html` and select **Open with Live Server**.
 4. The WebGL build will open in your default browser.
+
+### Option 3: In a restricted Itch.io page
+
+1. Go to this restricted [Itch.io](https://sanntt.itch.io/cibermatch) page
+2. Use the following password
+   ```bash
+   smartfense-santino
+   ```
+3. Click on the Run Game button and the game will load
