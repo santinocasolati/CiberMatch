@@ -240,6 +240,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a59f412d3addb6c41a374686beb7f61a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  returnDuration: 0.5
+  dragSfx: {fileID: 8300000, guid: c174b3364c836ad45b66008fd810704b, type: 3}
+  correctSfx: {fileID: 8300000, guid: f69000e0be40a45438943681e15717c2, type: 3}
+  wrongSfx: {fileID: 8300000, guid: ff2a21ec2c4ee574ebb73a232bcbcb16, type: 3}
 --- !u!114 &8058222486415494908
 MonoBehaviour:
   m_ObjectHideFlags: 0

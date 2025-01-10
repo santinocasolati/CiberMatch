@@ -9,6 +9,9 @@ using UnityEngine.UI;
 public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
     [SerializeField] private float returnDuration = .5f;
+    [SerializeField] private AudioClip dragSfx;
+    [SerializeField] private AudioClip correctSfx;
+    [SerializeField] private AudioClip wrongSfx;
 
     private int _id;
     private bool _isDraggable = false;
@@ -24,6 +27,7 @@ public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private PhraseController _hoveredPhrase = null;
 
     public int Id { get { return _id; } }
+    public bool IsDraggable { get { return _isDraggable; } }
 
     private void Awake()
     {
@@ -57,8 +61,9 @@ public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 _hoveredPhrase = null;
             }
 
-            if (otherPhrase != null)
+            if (otherPhrase != null && !otherPhrase.IsDraggable)
             {
+                ServiceLocator.Instance.AccessService<AudioService>().PlayAudio(dragSfx);
                 otherPhrase.gameObject.GetComponent<RectTransform>().localScale = new Vector2(1.5f, 1.5f);
                 _hoveredPhrase = otherPhrase;
             }
@@ -70,6 +75,7 @@ public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         MatchAnimationService matchAnimationService = ServiceLocator.Instance.AccessService<MatchAnimationService>();
         if (!_isDraggable || _isMoving || !matchAnimationService.CanDrag) return;
 
+        ServiceLocator.Instance.AccessService<AudioService>().PlayAudio(dragSfx);
         _hoveredPhrase = null;
         _originalAnchoredPosition = _rectTransform.anchoredPosition;
         transform.localScale = new Vector3(.85f, .85f, .85f);
@@ -89,19 +95,21 @@ public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         PhraseController otherPhrase = TryMatch(eventData.position);
 
-        if (otherPhrase == null)
+        if (otherPhrase == null || otherPhrase.IsDraggable)
         {
             MoveToOriginalPosition();
+            ServiceLocator.Instance.AccessService<AudioService>().PlayAudio(wrongSfx);
         }
         else if (_id != otherPhrase.Id)
         {
             MoveToOriginalPosition();
+            ServiceLocator.Instance.AccessService<AudioService>().PlayAudio(wrongSfx);
             ServiceLocator.Instance.AccessService<PhraseService>().PerformAttempt(false);
         }
         else
         {
             matchAnimationService.AnimateMatch(gameObject, otherPhrase.gameObject);
-
+            ServiceLocator.Instance.AccessService<AudioService>().PlayAudio(correctSfx);
             ServiceLocator.Instance.AccessService<PhraseService>().PerformAttempt(true);
         }
     }
