@@ -14,5 +14,30 @@ public class PhraseContainerController : MonoBehaviour
         phrase.transform.SetParent(transform, false);
 
         _phrases[id] = phrase;
+
+        ShufflePhrases();
+    }
+
+    private void ShufflePhrases()
+    {
+        List<Transform> children = new List<Transform>();
+
+        foreach (Transform child in transform)
+        {
+            children.Add(child);
+        }
+
+        for (int i = 0; i < children.Count; i++)
+        {
+            int randomIndex = Random.Range(i, children.Count);
+            Transform temp = children[i];
+            children[i] = children[randomIndex];
+            children[randomIndex] = temp;
+        }
+
+        for (int i = 0; i < children.Count; i++)
+        {
+            children[i].SetSiblingIndex(i);
+        }
     }
 }
