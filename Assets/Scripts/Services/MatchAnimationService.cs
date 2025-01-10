@@ -18,6 +18,7 @@ public class MatchAnimationService : BaseService
     private bool _canDrag = true;
 
     public bool CanDrag { get { return _canDrag; } }
+    public Action OnAnimationEnded;
 
     private void Awake()
     {
@@ -62,6 +63,7 @@ public class MatchAnimationService : BaseService
         {
             backgroundCanvasGroup.gameObject.SetActive(false);
             _canDrag = true;
+            OnAnimationEnded?.Invoke();
         });
     }
 

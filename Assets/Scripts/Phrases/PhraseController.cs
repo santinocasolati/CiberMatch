@@ -64,19 +64,32 @@ public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         PhraseController otherPhrase = TryMatch(eventData.position);
 
-        if (otherPhrase == null || _id != otherPhrase.Id)
+        if (otherPhrase == null)
         {
-            _isMoving = true;
-            _rectTransform.DOAnchorPos(_originalAnchoredPosition, returnDuration).OnComplete(() =>
-            {
-                _isMoving = false;
-            });
-            transform.localScale = Vector3.one;
-            _canvasGroup.alpha = 1f;
-            return;
+            MoveToOriginalPosition();
         }
+        else if (_id != otherPhrase.Id)
+        {
+            MoveToOriginalPosition();
+            ServiceLocator.Instance.AccessService<PhraseService>().PerformAttempt(false);
+        }
+        else
+        {
+            matchAnimationService.AnimateMatch(gameObject, otherPhrase.gameObject);
 
-        matchAnimationService.AnimateMatch(gameObject, otherPhrase.gameObject);
+            ServiceLocator.Instance.AccessService<PhraseService>().PerformAttempt(true);
+        }
+    }
+
+    private void MoveToOriginalPosition()
+    {
+        _isMoving = true;
+        _rectTransform.DOAnchorPos(_originalAnchoredPosition, returnDuration).OnComplete(() =>
+        {
+            _isMoving = false;
+        });
+        transform.localScale = Vector3.one;
+        _canvasGroup.alpha = 1f;
     }
 
     private PhraseController TryMatch(Vector2 position)
