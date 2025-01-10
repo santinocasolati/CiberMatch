@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     private void AddAttempt()
     {
         _attempts++;
-        attemptsText.text = $"Attempts: {_attempts}";
+        attemptsText.text = $"Intentos: {_attempts}";
     }
 
     private void MatchGuessed()
