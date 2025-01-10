@@ -21,6 +21,8 @@ public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private Vector2 _originalAnchoredPosition;
 
+    private PhraseController _hoveredPhrase = null;
+
     public int Id { get { return _id; } }
 
     private void Awake()
@@ -45,6 +47,22 @@ public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         if (!_isDraggable || _isMoving || !matchAnimationService.CanDrag) return;
 
         _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
+
+        PhraseController otherPhrase = TryMatch(eventData.position);
+        if (otherPhrase != _hoveredPhrase)
+        {
+            if (_hoveredPhrase != null)
+            {
+                _hoveredPhrase.gameObject.GetComponent<RectTransform>().localScale = Vector2.one;
+                _hoveredPhrase = null;
+            }
+
+            if (otherPhrase != null)
+            {
+                otherPhrase.gameObject.GetComponent<RectTransform>().localScale = new Vector2(1.5f, 1.5f);
+                _hoveredPhrase = otherPhrase;
+            }
+        }
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -52,6 +70,7 @@ public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         MatchAnimationService matchAnimationService = ServiceLocator.Instance.AccessService<MatchAnimationService>();
         if (!_isDraggable || _isMoving || !matchAnimationService.CanDrag) return;
 
+        _hoveredPhrase = null;
         _originalAnchoredPosition = _rectTransform.anchoredPosition;
         transform.localScale = new Vector3(.85f, .85f, .85f);
         _canvasGroup.alpha = .6f;
@@ -61,6 +80,12 @@ public class PhraseController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         MatchAnimationService matchAnimationService = ServiceLocator.Instance.AccessService<MatchAnimationService>();
         if (!_isDraggable || _isMoving || !matchAnimationService.CanDrag) return;
+
+        if (_hoveredPhrase != null)
+        {
+            _hoveredPhrase.gameObject.GetComponent<RectTransform>().localScale = Vector2.one;
+            _hoveredPhrase = null;
+        }
 
         PhraseController otherPhrase = TryMatch(eventData.position);
 
